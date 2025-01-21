@@ -1,0 +1,569 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: #1d1d1f;
+    background-color: #fbfbfd;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header styles */
+.site-header {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.main-nav {
+    height: 48px;
+    display: flex;
+    justify-content: center;
+}
+
+.nav-container {
+    max-width: 980px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.logo a {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: #1d1d1f;
+    text-decoration: none;
+    letter-spacing: -0.5px;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #1d1d1f;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+}
+
+.nav-link:hover {
+    opacity: 1;
+}
+
+/* Hero Section */
+.hero-section {
+    text-align: center;
+    padding: 120px 0 60px;
+    background: linear-gradient(180deg, #fbfbfd 0%, #fff 100%);
+}
+
+.hero-section h1 {
+    font-size: 3.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #1d1d1f;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+}
+
+.hero-section p {
+    font-size: 1.5rem;
+    color: #86868b;
+    max-width: 600px;
+    margin: 0 auto;
+    letter-spacing: -0.2px;
+}
+
+/* Message Form */
+.composition-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.editor-group {
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+.message-form {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #1d1d1f;
+    font-size: 0.95rem;
+}
+
+textarea, input, select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #d2d2d7;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background-color: #fafafa;
+}
+
+textarea:focus, input:focus, select:focus {
+    outline: none;
+    border-color: #0071e3;
+    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+    background-color: #fff;
+}
+
+.preview-section {
+    display: none;
+}
+
+.submit-btn {
+    background-color: #0071e3;
+    color: #fff;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.submit-btn:hover {
+    background-color: #0077ed;
+    transform: translateY(-1px);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+/* Footer styles */
+.site-footer {
+    background-color: #f5f5f7;
+    padding: 2rem 0;
+    margin-top: 4rem;
+    border-top: 1px solid #d2d2d7;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 20px;
+    font-size: 0.9rem;
+    color: #86868b;
+}
+
+.footer-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.footer-links a {
+    text-decoration: none;
+    color: #515154;
+    transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+    color: #1d1d1f;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 2.5rem;
+        padding: 0 20px;
+    }
+
+    .hero-section p {
+        font-size: 1.2rem;
+        padding: 0 20px;
+    }
+
+    .composition-section {
+        padding: 1rem;
+    }
+
+    .message-form {
+        padding: 1.5rem;
+    }
+}
+
+/* Add these About Page Styles to the end of your existing CSS file */
+
+.about-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.about-content {
+    background-color: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+    padding: 3rem;
+    margin-top: 2rem;
+}
+
+.feature-block {
+    margin-bottom: 3.5rem;
+}
+
+.feature-block:last-child {
+    margin-bottom: 0;
+}
+
+.feature-block h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #1d1d1f;
+    letter-spacing: -0.5px;
+    font-weight: 600;
+}
+
+.feature-block p {
+    font-size: 1.1rem;
+    color: #515154;
+    line-height: 1.6;
+}
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.step {
+    background: #f5f5f7;
+    padding: 2rem;
+    border-radius: 12px;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.step:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.step-number {
+    background: #0071e3;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.step h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+    color: #1d1d1f;
+    font-weight: 500;
+}
+
+.step p {
+    font-size: 0.95rem;
+    color: #515154;
+}
+
+.benefits-list {
+    list-style: none;
+    margin-top: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.benefits-list li {
+    font-size: 1.1rem;
+    color: #515154;
+    padding: 1.5rem;
+    background: #f5f5f7;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.2s ease;
+}
+
+.benefits-list li:hover {
+    transform: translateY(-2px);
+}
+
+.cta-block {
+    text-align: center;
+    background: linear-gradient(180deg, #f5f5f7 0%, #fff 100%);
+    padding: 4rem 2rem;
+    border-radius: 12px;
+    margin-top: 4rem;
+}
+
+.cta-block h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.cta-button {
+    display: inline-block;
+    background-color: #0071e3;
+    color: #fff;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-top: 1.5rem;
+    transition: all 0.2s ease;
+}
+
+.cta-button:hover {
+    background-color: #0077ed;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 113, 227, 0.2);
+}
+
+/* Responsive Design for About Page */
+@media (max-width: 768px) {
+    .about-content {
+        padding: 2rem;
+    }
+
+    .steps-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .benefits-list {
+        grid-template-columns: 1fr;
+    }
+
+    .feature-block h2 {
+        font-size: 1.75rem;
+    }
+
+    .cta-block {
+        padding: 3rem 1.5rem;
+    }
+
+    .cta-block h2 {
+        font-size: 2rem;
+    }
+}
+
+/* Add these to your existing CSS */
+
+/* Markdown Editor Styles */
+.EasyMDEContainer {
+    display: block !important;
+}
+
+.CodeMirror {
+    min-height: 400px !important;
+    border: 1px solid #d2d2d7;
+    border-radius: 12px;
+    background-color: #fff;
+}
+
+.editor-toolbar {
+    border: 1px solid #d2d2d7;
+    border-bottom: none;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    background-color: #f5f5f7;
+    opacity: 1 !important;
+}
+
+.editor-toolbar button {
+    color: #1d1d1f !important;
+}
+
+.editor-toolbar button:hover {
+    background-color: #e5e5e5 !important;
+    border-color: #d2d2d7 !important;
+}
+
+/* Style the textarea but keep it visible for form submission */
+textarea#message-input {
+    opacity: 0;
+    height: 0;
+    position: absolute;
+}
+
+/* Template Selection */
+.template-section {
+    margin-bottom: 1.5rem;
+}
+
+.template-select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #d2d2d7;
+    border-radius: 12px;
+    font-size: 1rem;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.template-select:focus {
+    outline: none;
+    border-color: #0071e3;
+    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+}
+
+/* Confirmation Message */
+.confirmation-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.confirmation-content {
+    text-align: center;
+}
+
+.confirmation-content h3 {
+    color: #1d1d1f;
+    margin-bottom: 0.5rem;
+}
+
+.delivery-date {
+    font-weight: 500;
+    color: #0071e3;
+    margin: 1rem 0;
+}
+
+.close-confirmation {
+    background: none;
+    border: none;
+    color: #86868b;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+}
+
+.close-confirmation:hover {
+    color: #1d1d1f;
+}
+
+/* Legal Pages Styles */
+.legal-content {
+    max-width: 800px;
+    margin: 80px auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+}
+
+.legal-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #1d1d1f;
+}
+
+.last-updated {
+    color: #86868b;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+}
+
+.legal-content section {
+    margin-bottom: 2rem;
+}
+
+.legal-content h2 {
+    font-size: 1.5rem;
+    color: #1d1d1f;
+    margin-bottom: 1rem;
+}
+
+.legal-content p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    color: #515154;
+}
+
+.legal-content ul {
+    list-style: disc;
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.legal-content li {
+    margin-bottom: 0.5rem;
+    color: #515154;
+}
+
+@media (max-width: 768px) {
+    .legal-content {
+        margin: 60px auto;
+        padding: 1.5rem;
+    }
+
+    .legal-content h1 {
+        font-size: 2rem;
+    }
+
+    .legal-content h2 {
+        font-size: 1.3rem;
+    }
+}

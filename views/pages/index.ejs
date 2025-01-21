@@ -1,0 +1,53 @@
+<div class="hero-section">
+    <h1>Write to Your Future Self</h1>
+    <p>Capture this moment and rediscover it in the future</p>
+</div>
+
+<div class="composition-section">
+    <form id="future-message-form" class="message-form">
+        <div class="template-section">
+            <label for="template-select">Choose a Template (Optional)</label>
+            <select id="template-select" class="template-select">
+                <option value="">Start from scratch</option>
+                <option value="goals">Goals List</option>
+                <option value="reflection">Daily Reflection</option>
+                <option value="letter">Personal Letter</option>
+            </select>
+        </div>
+
+        <div class="form-group editor-group">
+            <label for="message-input">Your Message</label>
+            <textarea 
+                id="message-input" 
+                name="message" 
+                required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="delivery-time">Delivery Time</label>
+            <select id="delivery-time" name="deliveryTime" required>
+                <% if (process.env.NODE_ENV === 'development') { %>
+                    <option value="1">Test: In 1 minute</option>
+                    <option value="5">Test: In 5 minutes</option>
+                    <option value="10">Test: In 10 minutes</option>
+                    <option disabled>──────────</option>
+                <% } %>
+                <option value="90">In 90 days</option>
+                <option value="180">In 180 days</option>
+                <option value="365">In 365 days</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Your Email</label>
+            <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                placeholder="your@email.com"
+                required>
+        </div>
+
+        <button type="submit" class="submit-btn">Send to Future Me →</button>
+    </form>
+</div> 

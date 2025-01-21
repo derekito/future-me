@@ -1,0 +1,15 @@
+mkdir -p future-me/public/{css,js,images}
+mkdir -p future-me/views/{layouts,pages,partials}
+mkdir -p future-me/src/{routes,controllers,models,utils}
+
+# Install dependencies
+npm install
+
+# Create .env file
+cp .env.example .env
+
+# Create SQLite database and tables
+node setup-db.js
+
+# Start the development server
+npm run dev 
