@@ -14,8 +14,11 @@ const pagesRouter = require('./src/routes/pages');
 // Load environment variables
 dotenv.config();
 
+const isDevelopment = process.env.NODE_ENV === 'development';
+const isRender = process.env.RENDER === 'true';
+
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || (isRender ? 10000 : 3000);
 
 // Middleware
 app.use(express.json());
@@ -56,14 +59,10 @@ function initializeDatabase() {
 let transporter;
 
 async function setupEmailTransporter() {
-    if (process.env.NODE_ENV === 'development') {
-        try {
-            console.log('Creating test email account...');
+    try {
+        if (isDevelopment) {
+            console.log('Setting up development email...');
             const testAccount = await nodemailer.createTestAccount();
-            console.log('Test account created:', {
-                user: testAccount.user,
-                pass: testAccount.pass
-            });
             
             transporter = nodemailer.createTransport({
                 host: "smtp.ethereal.email",
@@ -74,24 +73,22 @@ async function setupEmailTransporter() {
                     pass: testAccount.pass,
                 },
             });
-            
-            // Verify the connection
-            await transporter.verify();
-            console.log('Email transporter verified and ready');
-        } catch (error) {
-            console.error('Error setting up email:', error);
+        } else {
+            // For Render deployment, use a real SMTP service
+            transporter = nodemailer.createTransport({
+                service: 'Gmail', // or another service
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS
+                }
+            });
         }
-    } else {
-        // Configure for production (you'll need to add these to your .env file)
-        transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: process.env.SMTP_PORT,
-            secure: true,
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS,
-            },
-        });
+        
+        // Verify connection
+        await transporter.verify();
+        console.log('Email configuration verified successfully');
+    } catch (error) {
+        console.error('Email setup error:', error);
     }
 }
 
@@ -251,10 +248,18 @@ const getAvailablePort = async (startPort) => {
 // Update the server start section
 const startServer = async () => {
     try {
-        const port = await getAvailablePort(process.env.PORT || 3000);
-        app.listen(port, () => {
-            console.log(`Server is running on port ${port}`);
-        });
+        if (isRender) {
+            // On Render, just use the assigned port
+            app.listen(PORT, () => {
+                console.log(`Server is running on port ${PORT}`);
+            });
+        } else {
+            // Local development can use port finding
+            const port = await getAvailablePort(PORT);
+            app.listen(port, () => {
+                console.log(`Server is running on port ${port}`);
+            });
+        }
     } catch (error) {
         console.error('Error starting server:', error);
         process.exit(1);

@@ -3,9 +3,13 @@ services:
     name: future-me
     env: node
     buildCommand: npm install
-    startCommand: node server.js
+    startCommand: npm run render-start
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000 
+      - key: RENDER
+        value: true
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
