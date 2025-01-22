@@ -1,6 +1,25 @@
+const dotenv = require('dotenv');
+
+// Load environment variables at the very start
+dotenv.config();
+
+// Immediately check if we have the required variables
+const requiredVars = ['EMAIL_USER', 'EMAIL_PASS'];
+const missingVars = requiredVars.filter(varName => !process.env[varName]);
+
+if (missingVars.length > 0) {
+    console.error('Critical: Missing environment variables:', {
+        missing: missingVars,
+        NODE_ENV: process.env.NODE_ENV,
+        RENDER: process.env.RENDER,
+        EMAIL_USER_SET: !!process.env.EMAIL_USER,
+        EMAIL_PASS_SET: !!process.env.EMAIL_PASS,
+        current_env: process.env
+    });
+}
+
 const express = require('express');
 const path = require('path');
-const dotenv = require('dotenv');
 const sqlite3 = require('sqlite3').verbose();
 const net = require('net');
 const expressLayouts = require('express-ejs-layouts');
@@ -10,9 +29,6 @@ const marked = require('marked');
 const createDOMPurify = require('dompurify');
 const { JSDOM } = require('jsdom');
 const pagesRouter = require('./src/routes/pages');
-
-// Load environment variables
-dotenv.config();
 
 // Log environment status
 console.log('Environment Configuration:', {
