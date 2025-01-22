@@ -3,12 +3,14 @@ services:
     name: future-me
     env: node
     buildCommand: npm install
-    startCommand: npm run render-start
+    startCommand: node server.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: RENDER
         value: "true"
+      - key: PORT
+        value: "10000"
       - key: EMAIL_USER
         value: futuremewisdom@gmail.com
       - key: EMAIL_PASS

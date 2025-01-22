@@ -11,12 +11,19 @@ const createDOMPurify = require('dompurify');
 const { JSDOM } = require('jsdom');
 const pagesRouter = require('./src/routes/pages');
 
-// Load environment variables based on NODE_ENV
-if (process.env.NODE_ENV === 'production') {
-    dotenv.config({ path: '.env.production' });
-} else {
-    dotenv.config({ path: '.env' });
-}
+// Load environment variables
+dotenv.config();
+
+// Log environment status
+console.log('Environment Configuration:', {
+    NODE_ENV: process.env.NODE_ENV,
+    RENDER: process.env.RENDER,
+    PORT: process.env.PORT,
+    EMAIL_CONFIG: {
+        user: process.env.EMAIL_USER ? 'set' : 'not set',
+        pass: process.env.EMAIL_PASS ? 'set' : 'not set'
+    }
+});
 
 function loadEnvironmentVariables() {
     // Log environment status (without exposing sensitive data)
