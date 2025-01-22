@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const messageInput = document.getElementById('message-input');
     if (messageInput) {
-        // Initialize EasyMDE with minimal configuration
+        // Initialize EasyMDE with bare minimum configuration
         const easyMDE = new EasyMDE({
             element: messageInput,
             spellChecker: false,
@@ -10,20 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
                      'quote', 'unordered-list', 'ordered-list', '|', 
                      'link', '|', 'guide'],
             autosave: false,
-            localStorage: false,
-            forceSync: true,
-            minHeight: '400px',
-            hideIcons: [],
-            showIcons: ['bold', 'italic', 'heading', 'quote', 'unordered-list', 'ordered-list', 'link', 'guide'],
-            renderingConfig: {
-                singleLineBreaks: false,
-                codeSyntaxHighlighting: false,
-            }
-        });
-
-        // Sync EasyMDE content with textarea
-        easyMDE.codemirror.on('change', () => {
-            messageInput.value = easyMDE.value();
+            localStorage: false
         });
 
         // Templates
@@ -37,12 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const templateSelect = document.getElementById('template-select');
         if (templateSelect) {
             templateSelect.addEventListener('change', function() {
-                if (this.value && templates[this.value]) {
-                    easyMDE.value(templates[this.value]);
-                    messageInput.value = templates[this.value];
+                const selectedTemplate = templates[this.value];
+                if (selectedTemplate) {
+                    easyMDE.value(selectedTemplate);
                 } else {
                     easyMDE.value('');
-                    messageInput.value = '';
                 }
             });
         }
@@ -53,9 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
-                messageInput.value = easyMDE.value();
-                
-                if (!messageInput.value.trim()) {
+                const message = easyMDE.value();
+                if (!message.trim()) {
                     alert('Please write a message before submitting.');
                     return;
                 }
@@ -67,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            message: messageInput.value,
+                            message: message,
                             email: form.querySelector('#email').value,
                             deliveryTime: form.querySelector('#delivery-time').value
                         })
@@ -78,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (response.ok) {
                         showConfirmation(result.deliveryDate);
                         easyMDE.value('');
-                        messageInput.value = '';
                         form.reset();
                     } else {
                         throw new Error(result.error || 'Failed to send message');
