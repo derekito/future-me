@@ -105,6 +105,7 @@ body {
 
 .editor-group {
     margin-bottom: 2rem;
+    width: 100%;
 }
 
 .message-form {
@@ -126,21 +127,20 @@ body {
     font-size: 0.95rem;
 }
 
-textarea, input, select {
+select, input, textarea {
     width: 100%;
     padding: 0.8rem;
     border: 1px solid #d2d2d7;
     border-radius: 12px;
     font-size: 1rem;
-    transition: all 0.2s ease;
-    background-color: #fafafa;
+    margin-bottom: 1rem;
 }
 
-textarea:focus, input:focus, select:focus {
-    outline: none;
-    border-color: #0071e3;
-    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
-    background-color: #fff;
+.template-select, #delivery-time {
+    appearance: auto;
+    -webkit-appearance: auto;
+    background-color: white;
+    cursor: pointer;
 }
 
 .preview-section {
