@@ -566,3 +566,22 @@ textarea#message-input {
         font-size: 1.3rem;
     }
 }
+
+/* Message Input Styles */
+#message-input {
+    width: 100%;
+    min-height: 400px;
+    padding: 1rem;
+    border: 1px solid #d2d2d7;
+    border-radius: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
+    font-size: 1rem;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+#message-input:focus {
+    outline: none;
+    border-color: #0071e3;
+    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+}
