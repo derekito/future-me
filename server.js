@@ -131,72 +131,99 @@ transporter.verify()
 const window = new JSDOM('').window;
 const DOMPurify = createDOMPurify(window);
 
-// Add this function to check and send due messages
+// Update the checkAndSendMessages function with more detailed logging
 async function checkAndSendMessages() {
-    if (!transporter) {
-        console.error('Email transporter not initialized');
-        return;
-    }
-
     console.log('\n=== Checking for messages to send ===');
-    console.log('Current time:', new Date().toISOString());
+    const now = new Date();
+    console.log('Current time:', now.toISOString());
     
-    // Modified query to include messages that are within the last minute
+    // More lenient query that looks for messages in a wider window
     const query = `
         SELECT * FROM messages 
         WHERE sent = 0 
-        AND delivery_date <= datetime('now', '+1 minute')
-        AND delivery_date >= datetime('now', '-1 minute')
+        AND datetime(delivery_date) <= datetime('now', '+2 minutes')
     `;
 
     db.all(query, [], async (err, messages) => {
         if (err) {
-            console.error('Database error:', err);
+            console.error('Database query error:', err);
             return;
         }
 
-        console.log(`Found ${messages.length} messages to send`);
+        console.log(`Found ${messages.length} pending messages`);
+        
+        if (messages.length > 0) {
+            console.log('Pending messages:', messages.map(m => ({
+                id: m.id,
+                email: m.email,
+                delivery_date: m.delivery_date,
+                current_time: now.toISOString()
+            })));
+        }
         
         for (const message of messages) {
             try {
-                console.log(`\nPreparing to send message ${message.id} to ${message.email}`);
+                console.log(`\nAttempting to send message ${message.id}:`, {
+                    to: message.email,
+                    scheduled_for: message.delivery_date,
+                    current_time: now.toISOString()
+                });
                 
                 const info = await transporter.sendMail({
-                    from: '"Future Me" <futuremewisdom@gmail.com>',  // Update this to match your Gmail
+                    from: '"Future Me" <futuremewisdom@gmail.com>',
                     to: message.email,
                     subject: "A Message from Your Past Self",
                     text: message.message,
                     html: DOMPurify.sanitize(marked.parse(message.message))
                 });
 
-                console.log('Message sent successfully:', {
+                console.log('Email sent successfully:', {
                     messageId: info.messageId,
                     response: info.response,
                     accepted: info.accepted,
-                    rejected: info.rejected,
-                    deliveryTime: message.delivery_date
+                    rejected: info.rejected
                 });
 
-                // Mark message as sent
-                db.run('UPDATE messages SET sent = 1 WHERE id = ?', [message.id], (updateErr) => {
-                    if (updateErr) {
-                        console.error('Error marking message as sent:', updateErr);
-                    } else {
-                        console.log(`Message ${message.id} marked as sent`);
-                    }
+                // Update the message status
+                await new Promise((resolve, reject) => {
+                    db.run(
+                        'UPDATE messages SET sent = 1 WHERE id = ?',
+                        [message.id],
+                        function(updateErr) {
+                            if (updateErr) {
+                                console.error('Failed to mark message as sent:', updateErr);
+                                reject(updateErr);
+                            } else {
+                                console.log(`Message ${message.id} marked as sent`);
+                                resolve();
+                            }
+                        }
+                    );
                 });
             } catch (error) {
-                console.error('Error sending message:', {
+                console.error('Failed to send message:', {
                     messageId: message.id,
                     error: error.message,
-                    code: error.code,
-                    command: error.command,
-                    deliveryTime: message.delivery_date
+                    stack: error.stack,
+                    delivery_date: message.delivery_date
                 });
             }
         }
     });
 }
+
+// Update the cron schedule to run more frequently
+cron.schedule('*/30 * * * * *', () => {
+    console.log('\nCron job triggered at:', new Date().toISOString());
+    checkAndSendMessages();
+});
+
+// Also check for messages immediately when the server starts
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+    console.log('Checking for pending messages on startup...');
+    checkAndSendMessages();
+});
 
 // Routes
 // app.get('/', (req, res) => {
@@ -257,11 +284,6 @@ app.post('/api/messages', async (req, res) => {
         console.error('Error in message submission:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
-});
-
-// Set up cron job to check for messages every minute
-cron.schedule('* * * * *', () => {
-    checkAndSendMessages();
 });
 
 const getAvailablePort = async (startPort) => {
