@@ -212,18 +212,42 @@ async function checkAndSendMessages() {
     });
 }
 
+// Remove the duplicate app.listen and consolidate server startup
+const startServer = async () => {
+    try {
+        let port = PORT;
+        if (!isRender) {
+            // Local development can use port finding
+            port = await getAvailablePort(PORT);
+        }
+
+        const server = app.listen(port, () => {
+            console.log(`Server is running on port ${port}`);
+            console.log('Checking for pending messages on startup...');
+            checkAndSendMessages();
+        });
+
+        server.on('error', (error) => {
+            console.error('Server error:', error);
+            if (error.code === 'EADDRINUSE') {
+                console.error(`Port ${port} is already in use`);
+            }
+        });
+
+    } catch (error) {
+        console.error('Error starting server:', error);
+        process.exit(1);
+    }
+};
+
 // Update the cron schedule to run more frequently
 cron.schedule('*/30 * * * * *', () => {
     console.log('\nCron job triggered at:', new Date().toISOString());
     checkAndSendMessages();
 });
 
-// Also check for messages immediately when the server starts
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log('Checking for pending messages on startup...');
-    checkAndSendMessages();
-});
+// Start the server
+startServer();
 
 // Routes
 // app.get('/', (req, res) => {
@@ -307,25 +331,13 @@ const getAvailablePort = async (startPort) => {
     return port;
 };
 
-// Update the server start section
-const startServer = async () => {
-    try {
-        if (isRender) {
-            // On Render, just use the assigned port
-            app.listen(PORT, () => {
-                console.log(`Server is running on port ${PORT}`);
-            });
-        } else {
-            // Local development can use port finding
-            const port = await getAvailablePort(PORT);
-            app.listen(port, () => {
-                console.log(`Server is running on port ${port}`);
-            });
-        }
-    } catch (error) {
-        console.error('Error starting server:', error);
-        process.exit(1);
-    }
-};
+// Routes
+// app.get('/', (req, res) => {
+//     res.render('pages/index', {
+//         env: process.env.NODE_ENV || 'development'
+//     });
+// });
 
-startServer(); 
+// app.get('/about', (req, res) => {
+//     res.render('pages/about');
+// }); 
