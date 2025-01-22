@@ -141,10 +141,12 @@ async function checkAndSendMessages() {
     console.log('\n=== Checking for messages to send ===');
     console.log('Current time:', new Date().toISOString());
     
+    // Modified query to include messages that are within the last minute
     const query = `
         SELECT * FROM messages 
         WHERE sent = 0 
-        AND delivery_date <= datetime('now')
+        AND delivery_date <= datetime('now', '+1 minute')
+        AND delivery_date >= datetime('now', '-1 minute')
     `;
 
     db.all(query, [], async (err, messages) => {
@@ -160,7 +162,7 @@ async function checkAndSendMessages() {
                 console.log(`\nPreparing to send message ${message.id} to ${message.email}`);
                 
                 const info = await transporter.sendMail({
-                    from: '"Future Me" <noreply@futureme.com>',
+                    from: '"Future Me" <futuremewisdom@gmail.com>',  // Update this to match your Gmail
                     to: message.email,
                     subject: "A Message from Your Past Self",
                     text: message.message,
@@ -171,22 +173,25 @@ async function checkAndSendMessages() {
                     messageId: info.messageId,
                     response: info.response,
                     accepted: info.accepted,
-                    rejected: info.rejected
+                    rejected: info.rejected,
+                    deliveryTime: message.delivery_date
                 });
 
-                if (isDevelopment) {
-                    console.log('Preview URL:', nodemailer.getTestMessageUrl(info));
-                }
-
                 // Mark message as sent
-                db.run('UPDATE messages SET sent = 1 WHERE id = ?', [message.id]);
-                console.log(`Message ${message.id} marked as sent`);
+                db.run('UPDATE messages SET sent = 1 WHERE id = ?', [message.id], (updateErr) => {
+                    if (updateErr) {
+                        console.error('Error marking message as sent:', updateErr);
+                    } else {
+                        console.log(`Message ${message.id} marked as sent`);
+                    }
+                });
             } catch (error) {
                 console.error('Error sending message:', {
                     messageId: message.id,
                     error: error.message,
                     code: error.code,
-                    command: error.command
+                    command: error.command,
+                    deliveryTime: message.delivery_date
                 });
             }
         }
