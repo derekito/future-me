@@ -79,25 +79,44 @@ const DOMPurify = createDOMPurify(window);
 // Check for messages to send
 function checkAndSendMessages() {
     console.log('\n=== Checking for messages to send ===');
-    console.log('Current time:', new Date().toISOString());
+    const now = new Date();
+    console.log('Current time:', now.toISOString());
 
+    // Modified query to be more lenient with time matching
     const query = `
         SELECT * FROM messages 
         WHERE sent = 0 
-        AND delivery_date <= datetime('now')
+        AND datetime(delivery_date) <= datetime('now', 'localtime')
     `;
 
     db.all(query, [], async (err, messages) => {
         if (err) {
-            console.error('Error checking messages:', err);
+            console.error('Database query error:', err);
             return;
         }
 
         console.log(`Found ${messages.length} messages to send`);
         
+        if (messages.length > 0) {
+            console.log('Messages to send:', messages.map(m => ({
+                id: m.id,
+                email: m.email,
+                delivery_date: m.delivery_date,
+                should_send: new Date(m.delivery_date) <= now
+            })));
+        }
+        
         for (const message of messages) {
             try {
-                console.log('Sending message to:', message.email);
+                console.log(`\nAttempting to send message ${message.id}:`, {
+                    to: message.email,
+                    scheduled_for: message.delivery_date,
+                    current_time: now.toISOString()
+                });
+
+                // Verify email configuration before sending
+                await transporter.verify();
+                
                 const info = await transporter.sendMail({
                     from: '"Future Me" <futuremewisdom@gmail.com>',
                     to: message.email,
@@ -106,10 +125,29 @@ function checkAndSendMessages() {
                     html: DOMPurify.sanitize(marked.parse(message.message))
                 });
 
-                console.log('Message sent:', info.messageId);
-                db.run('UPDATE messages SET sent = 1 WHERE id = ?', [message.id]);
+                console.log('Email sent successfully:', {
+                    messageId: info.messageId,
+                    response: info.response,
+                    accepted: info.accepted,
+                    rejected: info.rejected
+                });
+
+                // Mark as sent
+                db.run('UPDATE messages SET sent = 1 WHERE id = ?', [message.id], (updateErr) => {
+                    if (updateErr) {
+                        console.error('Error marking message as sent:', updateErr);
+                    } else {
+                        console.log(`Message ${message.id} marked as sent`);
+                    }
+                });
             } catch (error) {
-                console.error('Error sending message:', error);
+                console.error('Error sending message:', {
+                    messageId: message.id,
+                    error: error.message,
+                    code: error.code,
+                    command: error.command,
+                    delivery_date: message.delivery_date
+                });
             }
         }
     });
