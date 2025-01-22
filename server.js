@@ -58,6 +58,29 @@ function initializeDatabase() {
 // Add email configuration (we'll use a test account for development)
 let transporter;
 
+// Add environment variable validation
+function validateEnvironmentVariables() {
+    const required = ['EMAIL_USER', 'EMAIL_PASS'];
+    const missing = required.filter(key => !process.env[key]);
+    
+    if (missing.length > 0) {
+        console.error('Missing required environment variables:', missing);
+        console.log('Current environment:', {
+            NODE_ENV: process.env.NODE_ENV,
+            RENDER: process.env.RENDER,
+            EMAIL_USER_SET: !!process.env.EMAIL_USER,
+            EMAIL_PASS_SET: !!process.env.EMAIL_PASS
+        });
+        
+        if (!isDevelopment) {
+            throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+        }
+    }
+}
+
+// Call this before setting up email
+validateEnvironmentVariables();
+
 async function setupEmailTransporter() {
     try {
         if (isDevelopment) {
