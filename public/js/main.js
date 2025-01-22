@@ -1,16 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const messageInput = document.getElementById('message-input');
     if (messageInput) {
-        // Initialize EasyMDE with minimal configuration
-        const easyMDE = new EasyMDE({
-            element: messageInput,
-            spellChecker: false,
-            status: false,
-            toolbar: ['bold', 'italic'],
-            autofocus: false,
-            forceSync: true
-        });
-
         // Templates
         const templates = {
             'goals': `Dear Future Me,\n\nHere are the goals I'm working towards:\n\n1. \n2. \n3. \n\nBest wishes,\nPast Me`,
@@ -23,9 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (templateSelect) {
             templateSelect.addEventListener('change', function() {
                 if (this.value && templates[this.value]) {
-                    easyMDE.value(templates[this.value]);
+                    messageInput.value = templates[this.value];
                 } else {
-                    easyMDE.value('');
+                    messageInput.value = '';
                 }
             });
         }
@@ -36,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
-                const message = easyMDE.value();
+                const message = messageInput.value;
                 if (!message.trim()) {
                     alert('Please write a message before submitting.');
                     return;
@@ -59,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (response.ok) {
                         showConfirmation(result.deliveryDate);
-                        easyMDE.value('');
+                        messageInput.value = '';
                         form.reset();
                     } else {
                         throw new Error(result.error || 'Failed to send message');
