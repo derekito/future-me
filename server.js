@@ -60,7 +60,10 @@ async function setupEmailTransporter() {
         try {
             console.log('Creating test email account...');
             const testAccount = await nodemailer.createTestAccount();
-            console.log('Test account created:', testAccount.user);
+            console.log('Test account created:', {
+                user: testAccount.user,
+                pass: testAccount.pass
+            });
             
             transporter = nodemailer.createTransport({
                 host: "smtp.ethereal.email",
@@ -71,9 +74,12 @@ async function setupEmailTransporter() {
                     pass: testAccount.pass,
                 },
             });
-            console.log('Email transporter configured for development');
+            
+            // Verify the connection
+            await transporter.verify();
+            console.log('Email transporter verified and ready');
         } catch (error) {
-            console.error('Error setting up test email account:', error);
+            console.error('Error setting up email:', error);
         }
     } else {
         // Configure for production (you'll need to add these to your .env file)
@@ -99,6 +105,8 @@ const DOMPurify = createDOMPurify(window);
 // Add this function to check and send due messages
 async function checkAndSendMessages() {
     console.log('\n=== Checking for messages to send ===');
+    console.log('Current time:', new Date().toISOString());
+    
     const query = `
         SELECT * FROM messages 
         WHERE sent = 0 
@@ -113,17 +121,14 @@ async function checkAndSendMessages() {
 
         console.log(`Found ${messages.length} messages to send`);
         
-        if (messages.length > 0) {
-            console.log('Message delivery dates:', messages.map(m => ({
-                id: m.id,
-                delivery_date: m.delivery_date,
-                email: m.email
-            })));
-        }
-
         for (const message of messages) {
             try {
-                console.log(`\nAttempting to send message ${message.id} to ${message.email}`);
+                console.log(`\nSending message ${message.id}:`, {
+                    to: message.email,
+                    delivery_date: message.delivery_date,
+                    current_time: new Date().toISOString()
+                });
+
                 const info = await transporter.sendMail({
                     from: '"Future Me" <noreply@futureme.com>',
                     to: message.email,
@@ -132,20 +137,25 @@ async function checkAndSendMessages() {
                     html: DOMPurify.sanitize(marked.parse(message.message))
                 });
 
-                console.log('Message sent successfully');
+                console.log('Message sent:', {
+                    messageId: info.messageId,
+                    response: info.response
+                });
                 
                 if (process.env.NODE_ENV === 'development') {
                     const previewUrl = nodemailer.getTestMessageUrl(info);
-                    console.log('\n=== TEST EMAIL PREVIEW ===');
                     console.log('Preview URL:', previewUrl);
-                    console.log('========================\n');
                 }
 
                 // Mark message as sent
                 db.run('UPDATE messages SET sent = 1 WHERE id = ?', [message.id]);
                 console.log(`Message ${message.id} marked as sent`);
             } catch (error) {
-                console.error('Error sending message:', error);
+                console.error('Error sending message:', {
+                    messageId: message.id,
+                    error: error.message,
+                    stack: error.stack
+                });
             }
         }
     });
