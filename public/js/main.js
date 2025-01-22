@@ -1,6 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
     const messageInput = document.getElementById('message-input');
     if (messageInput) {
+        // Initialize EasyMDE
+        const easyMDE = new EasyMDE({
+            element: messageInput,
+            spellChecker: false,
+            status: false,
+            toolbar: [
+                'bold', 'italic', 'heading', '|',
+                'quote', 'unordered-list', 'ordered-list', '|',
+                'link', '|', 'guide'
+            ]
+        });
+
         // Templates
         const templates = {
             'goals': `# My Goals for the Future\n\nDear Future Me,\n\nHere are the goals I'm working towards:\n\n1. \n2. \n3. \n\nRemember why you started this journey!\n\nBest wishes,\nPast Me`,
@@ -12,11 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const templateSelect = document.getElementById('template-select');
         if (templateSelect) {
             templateSelect.addEventListener('change', function() {
-                const selectedTemplate = templates[this.value];
-                if (selectedTemplate) {
-                    messageInput.value = selectedTemplate;
+                if (this.value && templates[this.value]) {
+                    easyMDE.value(templates[this.value]);
                 } else {
-                    messageInput.value = '';
+                    easyMDE.value('');
                 }
             });
         }
@@ -27,7 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
-                if (!messageInput.value.trim()) {
+                const message = easyMDE.value();
+                if (!message.trim()) {
                     alert('Please write a message before submitting.');
                     return;
                 }
@@ -39,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            message: messageInput.value,
+                            message: message,
                             email: form.querySelector('#email').value,
                             deliveryTime: form.querySelector('#delivery-time').value
                         })
@@ -49,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (response.ok) {
                         showConfirmation(result.deliveryDate);
-                        messageInput.value = '';
+                        easyMDE.value('');
                         form.reset();
                     } else {
                         throw new Error(result.error || 'Failed to send message');

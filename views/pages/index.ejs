@@ -27,12 +27,6 @@
         <div class="form-group">
             <label for="delivery-time">Delivery Time</label>
             <select id="delivery-time" name="deliveryTime" required>
-                <% if (env === 'development' || env === 'production') { %>
-                    <option value="1">Test: In 1 minute</option>
-                    <option value="5">Test: In 5 minutes</option>
-                    <option value="10">Test: In 10 minutes</option>
-                    <option disabled>──────────</option>
-                <% } %>
                 <option value="90">In 90 days</option>
                 <option value="180">In 180 days</option>
                 <option value="365">In 365 days</option>
