@@ -10,7 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 'bold', 'italic', 'heading', '|',
                 'quote', 'unordered-list', 'ordered-list', '|',
                 'link', '|', 'guide'
-            ]
+            ],
+            initialValue: messageInput.value,
+            sideBySideFullscreen: false,
+            forceSync: true,
+            hideIcons: []
         });
 
         // Templates
@@ -26,11 +30,18 @@ document.addEventListener('DOMContentLoaded', () => {
             templateSelect.addEventListener('change', function() {
                 if (this.value && templates[this.value]) {
                     easyMDE.value(templates[this.value]);
+                    messageInput.value = templates[this.value]; // Keep textarea in sync
                 } else {
                     easyMDE.value('');
+                    messageInput.value = ''; // Keep textarea in sync
                 }
             });
         }
+
+        // Keep textarea in sync with editor
+        easyMDE.codemirror.on('change', () => {
+            messageInput.value = easyMDE.value();
+        });
 
         // Handle form submission
         const form = document.getElementById('future-message-form');
@@ -40,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('Form submitted');
                 
                 const message = easyMDE.value();
+                messageInput.value = message; // Ensure textarea is updated
                 const email = form.querySelector('#email').value;
                 const deliveryTime = form.querySelector('#delivery-time').value;
 
@@ -71,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (response.ok) {
                         showConfirmation(result.deliveryDate);
                         easyMDE.value('');
+                        messageInput.value = ''; // Keep textarea in sync
                         form.reset();
                     } else {
                         throw new Error(result.error || 'Failed to send message');

@@ -424,9 +424,11 @@ select, input, textarea {
 
 /* Style the textarea but keep it visible for form submission */
 textarea#message-input {
-    opacity: 0;
-    height: 0;
-    position: absolute;
+    /* Remove these properties if they exist */
+    /* opacity: 0; */
+    /* height: 0; */
+    /* position: absolute; */
+    /* display: none; */
 }
 
 /* Template Selection */
