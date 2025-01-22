@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const messageInput = document.getElementById('message-input');
     if (messageInput) {
-        // Initialize EasyMDE
+        // Initialize EasyMDE with storage disabled
         const easyMDE = new EasyMDE({
             element: messageInput,
             spellChecker: false,
@@ -10,7 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 'bold', 'italic', 'heading', '|',
                 'quote', 'unordered-list', 'ordered-list', '|',
                 'link', '|', 'guide'
-            ]
+            ],
+            autosave: false,
+            localStorage: false,
+            forceSync: true
         });
 
         // Sync EasyMDE content with textarea
@@ -20,49 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Templates
         const templates = {
-            'goals': `# My Goals for the Future
-
-Dear Future Me,
-
-Here are the goals I'm working towards:
-
-1. 
-2. 
-3. 
-
-Remember why you started this journey!
-
-Best wishes,
-Past Me`,
-            'reflection': `# Reflecting on Today
-
-Dear Future Me,
-
-Today I'm feeling:
-
-Three things I'm grateful for:
-1. 
-2. 
-3. 
-
-What I hope will change by the time you read this:
-
-Take care,
-Past Me`,
-            'letter': `Dear Future Me,
-
-I hope this message finds you well. As I write this, I want to share some thoughts with you:
-
-What's important to me right now:
-
-What I'm excited about:
-
-What I'm worried about:
-
-My hopes for you:
-
-With love,
-Past Me`
+            'goals': `# My Goals for the Future\n\nDear Future Me,\n\nHere are the goals I'm working towards:\n\n1. \n2. \n3. \n\nRemember why you started this journey!\n\nBest wishes,\nPast Me`,
+            'reflection': `# Reflecting on Today\n\nDear Future Me,\n\nToday I'm feeling:\n\nThree things I'm grateful for:\n1. \n2. \n3. \n\nWhat I hope will change by the time you read this:\n\nTake care,\nPast Me`,
+            'letter': `Dear Future Me,\n\nI hope this message finds you well. As I write this, I want to share some thoughts with you:\n\nWhat's important to me right now:\n\nWhat I'm excited about:\n\nWhat I'm worried about:\n\nMy hopes for you:\n\nWith love,\nPast Me`
         };
 
         // Handle template selection
@@ -71,10 +34,10 @@ Past Me`
             templateSelect.addEventListener('change', function() {
                 if (this.value && templates[this.value]) {
                     easyMDE.value(templates[this.value]);
-                    messageInput.value = templates[this.value]; // Update textarea
+                    messageInput.value = templates[this.value];
                 } else {
                     easyMDE.value('');
-                    messageInput.value = ''; // Update textarea
+                    messageInput.value = '';
                 }
             });
         }
@@ -85,7 +48,6 @@ Past Me`
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
-                // Update textarea with current editor content
                 messageInput.value = easyMDE.value();
                 
                 if (!messageInput.value.trim()) {
