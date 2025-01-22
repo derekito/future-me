@@ -12,7 +12,13 @@ document.addEventListener('DOMContentLoaded', () => {
             autosave: false,
             localStorage: false,
             forceSync: true,
-            minHeight: '200px'
+            minHeight: '400px',
+            hideIcons: [],
+            showIcons: ['bold', 'italic', 'heading', 'quote', 'unordered-list', 'ordered-list', 'link', 'guide'],
+            renderingConfig: {
+                singleLineBreaks: false,
+                codeSyntaxHighlighting: false,
+            }
         });
 
         // Sync EasyMDE content with textarea
