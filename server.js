@@ -16,6 +16,7 @@ dotenv.config();
 // Environment setup
 const isDevelopment = process.env.NODE_ENV === 'development';
 const PORT = process.env.PORT || 10000;
+const isRender = process.env.RENDER === 'true';
 
 // Initialize Express
 const app = express();
@@ -32,26 +33,35 @@ app.use('/', pagesRouter);
 app.set('view engine', 'ejs');
 app.set('views', './views');
 
+// Set up database path
+const dbPath = path.join(__dirname, 'messages.sqlite');
+console.log('Database path:', dbPath);
+
 // Initialize SQLite database
-const db = new sqlite3.Database('messages.sqlite', (err) => {
+const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('Database connection error:', err);
     } else {
         console.log('Connected to SQLite database');
+        // Create messages table if it doesn't exist
+        db.run(`
+            CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                message TEXT NOT NULL,
+                email TEXT NOT NULL,
+                delivery_date DATETIME NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                sent BOOLEAN DEFAULT 0
+            )
+        `, (err) => {
+            if (err) {
+                console.error('Error creating table:', err);
+            } else {
+                console.log('Messages table ready');
+            }
+        });
     }
 });
-
-// Create messages table if it doesn't exist
-db.run(`
-    CREATE TABLE IF NOT EXISTS messages (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        message TEXT NOT NULL,
-        email TEXT NOT NULL,
-        delivery_date DATETIME NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        sent BOOLEAN DEFAULT 0
-    )
-`);
 
 // Email configuration
 const transporter = nodemailer.createTransport({
@@ -68,6 +78,9 @@ const DOMPurify = createDOMPurify(window);
 
 // Check for messages to send
 function checkAndSendMessages() {
+    console.log('\n=== Checking for messages to send ===');
+    console.log('Current time:', new Date().toISOString());
+
     const query = `
         SELECT * FROM messages 
         WHERE sent = 0 
@@ -84,6 +97,7 @@ function checkAndSendMessages() {
         
         for (const message of messages) {
             try {
+                console.log('Sending message to:', message.email);
                 const info = await transporter.sendMail({
                     from: '"Future Me" <futuremewisdom@gmail.com>',
                     to: message.email,
@@ -108,6 +122,12 @@ cron.schedule('* * * * *', checkAndSendMessages);
 app.post('/api/messages', async (req, res) => {
     const { message, deliveryTime, email } = req.body;
     
+    console.log('Received message submission:', {
+        email,
+        deliveryTime,
+        messageLength: message?.length
+    });
+    
     const deliveryDate = new Date();
     if (deliveryTime <= 5) {
         deliveryDate.setMinutes(deliveryDate.getMinutes() + parseInt(deliveryTime));
@@ -126,6 +146,11 @@ app.post('/api/messages', async (req, res) => {
             res.status(500).json({ error: 'Failed to save message' });
             return;
         }
+        
+        console.log('Message saved successfully:', {
+            id: this.lastID,
+            deliveryDate: deliveryDate
+        });
         
         res.status(201).json({ 
             message: 'Message scheduled successfully',
