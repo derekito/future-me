@@ -37,14 +37,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (form) {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                console.log('Form submitted');
                 
                 const message = easyMDE.value();
+                const email = form.querySelector('#email').value;
+                const deliveryTime = form.querySelector('#delivery-time').value;
+
+                console.log('Form data:', { message, email, deliveryTime });
+
                 if (!message.trim()) {
                     alert('Please write a message before submitting.');
                     return;
                 }
 
                 try {
+                    console.log('Sending request to /api/messages');
                     const response = await fetch('/api/messages', {
                         method: 'POST',
                         headers: {
@@ -52,12 +59,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         body: JSON.stringify({
                             message: message,
-                            email: form.querySelector('#email').value,
-                            deliveryTime: form.querySelector('#delivery-time').value
+                            email: email,
+                            deliveryTime: deliveryTime
                         })
                     });
 
+                    console.log('Response status:', response.status);
                     const result = await response.json();
+                    console.log('Response data:', result);
 
                     if (response.ok) {
                         showConfirmation(result.deliveryDate);
@@ -67,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         throw new Error(result.error || 'Failed to send message');
                     }
                 } catch (error) {
-                    console.error('Error:', error);
+                    console.error('Error details:', error);
                     alert('There was an error sending your message. Please try again.');
                 }
             });
