@@ -14,6 +14,38 @@ const pagesRouter = require('./src/routes/pages');
 // Load environment variables
 dotenv.config();
 
+function loadEnvironmentVariables() {
+    // Load from .env file in development
+    if (process.env.NODE_ENV !== 'production') {
+        require('dotenv').config();
+    }
+
+    // Log environment status (without exposing sensitive data)
+    console.log('Environment Configuration:', {
+        NODE_ENV: process.env.NODE_ENV,
+        RENDER: process.env.RENDER,
+        PORT: process.env.PORT,
+        EMAIL_USER_EXISTS: !!process.env.EMAIL_USER,
+        EMAIL_PASS_EXISTS: !!process.env.EMAIL_PASS,
+        EMAIL_USER_LENGTH: process.env.EMAIL_USER?.length || 0,
+        EMAIL_PASS_LENGTH: process.env.EMAIL_PASS?.length || 0
+    });
+
+    // Validate required environment variables
+    const required = ['EMAIL_USER', 'EMAIL_PASS'];
+    const missing = required.filter(key => !process.env[key]);
+    
+    if (missing.length > 0) {
+        throw new Error(
+            `Missing required environment variables: ${missing.join(', ')}\n` +
+            'Please ensure these are set in your environment or .env file.'
+        );
+    }
+}
+
+// Call this before any other setup
+loadEnvironmentVariables();
+
 const isDevelopment = process.env.NODE_ENV === 'development';
 const isRender = process.env.RENDER === 'true';
 
