@@ -1,19 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
     const messageInput = document.getElementById('message-input');
     if (messageInput) {
-        // Initialize EasyMDE with storage disabled
+        // Initialize EasyMDE with minimal configuration
         const easyMDE = new EasyMDE({
             element: messageInput,
             spellChecker: false,
             status: false,
-            toolbar: [
-                'bold', 'italic', 'heading', '|',
-                'quote', 'unordered-list', 'ordered-list', '|',
-                'link', '|', 'guide'
-            ],
+            toolbar: ['bold', 'italic', 'heading', '|', 
+                     'quote', 'unordered-list', 'ordered-list', '|', 
+                     'link', '|', 'guide'],
             autosave: false,
             localStorage: false,
-            forceSync: true
+            forceSync: true,
+            minHeight: '200px'
         });
 
         // Sync EasyMDE content with textarea
