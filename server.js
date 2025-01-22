@@ -28,6 +28,7 @@ const marked = require('marked');
 const createDOMPurify = require('dompurify');
 const { JSDOM } = require('jsdom');
 const pagesRouter = require('./src/routes/pages');
+const fs = require('fs');
 
 // Log environment status
 console.log('Environment Configuration:', {
@@ -94,23 +95,35 @@ app.set('views', './views');
 const db = new sqlite3.Database('messages.sqlite', (err) => {
     if (err) {
         console.error('Error opening database:', err);
+        process.exit(1);  // Exit if we can't open the database
     } else {
         console.log('Connected to SQLite database');
+        // Initialize database and then start the server
         initializeDatabase();
     }
 });
 
 function initializeDatabase() {
-    db.run(`
-        CREATE TABLE IF NOT EXISTS messages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            message TEXT NOT NULL,
-            email TEXT NOT NULL,
-            delivery_date DATETIME NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            sent BOOLEAN DEFAULT 0
-        )
-    `);
+    return new Promise((resolve, reject) => {
+        db.run(`
+            CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                message TEXT NOT NULL,
+                email TEXT NOT NULL,
+                delivery_date DATETIME NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                sent BOOLEAN DEFAULT 0
+            )
+        `, (err) => {
+            if (err) {
+                console.error('Error creating table:', err);
+                reject(err);
+            } else {
+                console.log('Database initialized successfully');
+                resolve();
+            }
+        });
+    });
 }
 
 // Email configuration
@@ -212,12 +225,14 @@ async function checkAndSendMessages() {
     });
 }
 
-// Remove the duplicate app.listen and consolidate server startup
+// Update the server startup code
 const startServer = async () => {
     try {
+        // Wait for database initialization
+        await initializeDatabase();
+        
         let port = PORT;
         if (!isRender) {
-            // Local development can use port finding
             port = await getAvailablePort(PORT);
         }
 
@@ -235,7 +250,7 @@ const startServer = async () => {
         });
 
     } catch (error) {
-        console.error('Error starting server:', error);
+        console.error('Error during startup:', error);
         process.exit(1);
     }
 };
@@ -340,4 +355,12 @@ const getAvailablePort = async (startPort) => {
 
 // app.get('/about', (req, res) => {
 //     res.render('pages/about');
-// }); 
+// });
+
+// Add this near the top of your file with other requires
+const dbPath = path.join(__dirname, 'messages.sqlite');
+const dbDir = path.dirname(dbPath);
+
+// Create the directory if it doesn't exist
+if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true }); 
