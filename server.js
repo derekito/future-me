@@ -154,15 +154,15 @@ async function checkAndSendMessages() {
 }
 
 // Routes
-app.get('/', (req, res) => {
-    res.render('pages/index', {
-        env: process.env.NODE_ENV || 'development'
-    });
-});
+// app.get('/', (req, res) => {
+//     res.render('pages/index', {
+//         env: process.env.NODE_ENV || 'development'
+//     });
+// });
 
-app.get('/about', (req, res) => {
-    res.render('pages/about');
-});
+// app.get('/about', (req, res) => {
+//     res.render('pages/about');
+// });
 
 app.post('/api/messages', async (req, res) => {
     const { message, deliveryTime, email } = req.body;

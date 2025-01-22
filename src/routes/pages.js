@@ -3,7 +3,9 @@ const router = express.Router();
 
 // Home page
 router.get('/', (req, res) => {
-    res.render('pages/index');
+    res.render('pages/index', {
+        env: process.env.NODE_ENV || 'development'
+    });
 });
 
 // About page
