@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const messageInput = document.getElementById('message-input');
     if (messageInput) {
-        // Initialize EasyMDE
+        // Initialize EasyMDE with unique IDs
         const easyMDE = new EasyMDE({
             element: messageInput,
             spellChecker: false,
@@ -14,7 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
             initialValue: messageInput.value,
             sideBySideFullscreen: false,
             forceSync: true,
-            hideIcons: []
+            hideIcons: [],
+            uniqueId: 'message-editor'
         });
 
         // Templates
