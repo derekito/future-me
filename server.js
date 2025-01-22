@@ -3,19 +3,18 @@ const dotenv = require('dotenv');
 // Load environment variables at the very start
 dotenv.config();
 
-// Immediately check if we have the required variables
-const requiredVars = ['EMAIL_USER', 'EMAIL_PASS'];
-const missingVars = requiredVars.filter(varName => !process.env[varName]);
+// Simple environment check
+const EMAIL_USER = process.env.EMAIL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASS;
 
-if (missingVars.length > 0) {
-    console.error('Critical: Missing environment variables:', {
-        missing: missingVars,
+if (!EMAIL_USER || !EMAIL_PASS) {
+    console.error('Environment Status:', {
+        EMAIL_USER: EMAIL_USER ? 'present' : 'missing',
+        EMAIL_PASS: EMAIL_PASS ? 'present' : 'missing',
         NODE_ENV: process.env.NODE_ENV,
-        RENDER: process.env.RENDER,
-        EMAIL_USER_SET: !!process.env.EMAIL_USER,
-        EMAIL_PASS_SET: !!process.env.EMAIL_PASS,
-        current_env: process.env
+        RENDER: process.env.RENDER
     });
+    throw new Error('Required environment variables are missing');
 }
 
 const express = require('express');
@@ -114,99 +113,19 @@ function initializeDatabase() {
     `);
 }
 
-// Add email configuration (we'll use a test account for development)
-let transporter;
-
-// Add environment variable validation
-function validateEnvironmentVariables() {
-    const required = ['EMAIL_USER', 'EMAIL_PASS'];
-    const missing = required.filter(key => !process.env[key]);
-    
-    if (missing.length > 0) {
-        console.error('Missing required environment variables:', missing);
-        console.log('Current environment:', {
-            NODE_ENV: process.env.NODE_ENV,
-            RENDER: process.env.RENDER,
-            EMAIL_USER_SET: !!process.env.EMAIL_USER,
-            EMAIL_PASS_SET: !!process.env.EMAIL_PASS
-        });
-        
-        if (!isDevelopment) {
-            throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
-        }
+// Email configuration
+const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: EMAIL_USER,
+        pass: EMAIL_PASS
     }
-}
+});
 
-// Call this before setting up email
-validateEnvironmentVariables();
-
-async function setupEmailTransporter() {
-    try {
-        if (isDevelopment) {
-            console.log('Setting up development email transport...');
-            const testAccount = await nodemailer.createTestAccount();
-            transporter = nodemailer.createTransport({
-                host: 'smtp.ethereal.email',
-                port: 587,
-                secure: false,
-                auth: {
-                    user: testAccount.user,
-                    pass: testAccount.pass,
-                }
-            });
-            console.log('Development email configured with Ethereal');
-        } else {
-            console.log('Setting up production email transport...');
-            // Log environment variables (without showing full values)
-            console.log('Email configuration:', {
-                user: process.env.EMAIL_USER ? `${process.env.EMAIL_USER.slice(0, 3)}...` : 'not set',
-                pass: process.env.EMAIL_PASS ? 'is set' : 'not set'
-            });
-
-            if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-                throw new Error('Email credentials are not properly configured');
-            }
-
-            transporter = nodemailer.createTransport({
-                service: 'Gmail',
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS
-                }
-            });
-            console.log('Production email transport created');
-        }
-
-        // Test the connection
-        console.log('Verifying email configuration...');
-        await transporter.verify();
-        console.log('Email configuration verified successfully');
-    } catch (error) {
-        console.error('Email setup error:', {
-            message: error.message,
-            stack: error.stack,
-            code: error.code,
-            command: error.command
-        });
-        
-        // Create a dummy transporter for development to prevent crashes
-        if (isDevelopment) {
-            console.log('Creating fallback development transport');
-            transporter = nodemailer.createTransport({
-                host: 'smtp.ethereal.email',
-                port: 587,
-                secure: false,
-                auth: {
-                    user: 'dummy',
-                    pass: 'dummy'
-                }
-            });
-        }
-    }
-}
-
-// Initialize email setup
-setupEmailTransporter();
+// Verify email configuration
+transporter.verify()
+    .then(() => console.log('Email configuration verified successfully'))
+    .catch(error => console.error('Email verification failed:', error));
 
 // Initialize DOMPurify
 const window = new JSDOM('').window;

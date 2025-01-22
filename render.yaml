@@ -5,13 +5,11 @@ services:
     buildCommand: npm install
     startCommand: node server.js
     envVars:
-      - key: NODE_ENV
-        value: production
-      - key: RENDER
-        value: "true"
-      - key: PORT
-        value: "10000"
       - key: EMAIL_USER
         value: futuremewisdom@gmail.com
       - key: EMAIL_PASS
         value: zzedumtqthtnrkux
+      - key: NODE_ENV
+        value: production
+      - key: RENDER
+        value: "true"
