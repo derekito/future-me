@@ -173,7 +173,14 @@ app.post('/api/messages', async (req, res) => {
     
     // Calculate delivery date
     const deliveryDate = new Date();
-    deliveryDate.setDate(deliveryDate.getDate() + parseInt(deliveryTime));
+    if (deliveryTime <= 5) {
+        // For test intervals (1 or 5 minutes)
+        deliveryDate.setMinutes(deliveryDate.getMinutes() + parseInt(deliveryTime));
+        console.log('Test mode: Delivery scheduled for', deliveryDate);
+    } else {
+        // For production intervals (90, 180, 365 days)
+        deliveryDate.setDate(deliveryDate.getDate() + parseInt(deliveryTime));
+    }
     
     const query = `
         INSERT INTO messages (message, email, delivery_date)
