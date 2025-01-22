@@ -61,34 +61,39 @@ let transporter;
 async function setupEmailTransporter() {
     try {
         if (isDevelopment) {
-            console.log('Setting up development email...');
+            // For development, use Ethereal
             const testAccount = await nodemailer.createTestAccount();
-            
             transporter = nodemailer.createTransport({
-                host: "smtp.ethereal.email",
+                host: 'smtp.ethereal.email',
                 port: 587,
                 secure: false,
                 auth: {
                     user: testAccount.user,
                     pass: testAccount.pass,
-                },
+                }
             });
+            console.log('Development email configured with Ethereal');
         } else {
-            // For Render deployment, use a real SMTP service
+            // For production/Render
             transporter = nodemailer.createTransport({
-                service: 'Gmail', // or another service
+                host: 'smtp.gmail.com',
+                port: 465,
+                secure: true,
                 auth: {
                     user: process.env.EMAIL_USER,
                     pass: process.env.EMAIL_PASS
                 }
             });
+            console.log('Production email configured with Gmail');
         }
-        
-        // Verify connection
+
+        // Test the connection
         await transporter.verify();
         console.log('Email configuration verified successfully');
     } catch (error) {
         console.error('Email setup error:', error);
+        // Don't exit the process, but log the error
+        console.error('Detailed error:', error.message);
     }
 }
 
