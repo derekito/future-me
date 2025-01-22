@@ -61,7 +61,7 @@ let transporter;
 async function setupEmailTransporter() {
     try {
         if (isDevelopment) {
-            // For development, use Ethereal
+            console.log('Setting up development email transport...');
             const testAccount = await nodemailer.createTestAccount();
             transporter = nodemailer.createTransport({
                 host: 'smtp.ethereal.email',
@@ -74,26 +74,52 @@ async function setupEmailTransporter() {
             });
             console.log('Development email configured with Ethereal');
         } else {
-            // For production/Render
+            console.log('Setting up production email transport...');
+            // Log environment variables (without showing full values)
+            console.log('Email configuration:', {
+                user: process.env.EMAIL_USER ? `${process.env.EMAIL_USER.slice(0, 3)}...` : 'not set',
+                pass: process.env.EMAIL_PASS ? 'is set' : 'not set'
+            });
+
+            if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+                throw new Error('Email credentials are not properly configured');
+            }
+
             transporter = nodemailer.createTransport({
-                host: 'smtp.gmail.com',
-                port: 465,
-                secure: true,
+                service: 'Gmail',
                 auth: {
                     user: process.env.EMAIL_USER,
                     pass: process.env.EMAIL_PASS
                 }
             });
-            console.log('Production email configured with Gmail');
+            console.log('Production email transport created');
         }
 
         // Test the connection
+        console.log('Verifying email configuration...');
         await transporter.verify();
         console.log('Email configuration verified successfully');
     } catch (error) {
-        console.error('Email setup error:', error);
-        // Don't exit the process, but log the error
-        console.error('Detailed error:', error.message);
+        console.error('Email setup error:', {
+            message: error.message,
+            stack: error.stack,
+            code: error.code,
+            command: error.command
+        });
+        
+        // Create a dummy transporter for development to prevent crashes
+        if (isDevelopment) {
+            console.log('Creating fallback development transport');
+            transporter = nodemailer.createTransport({
+                host: 'smtp.ethereal.email',
+                port: 587,
+                secure: false,
+                auth: {
+                    user: 'dummy',
+                    pass: 'dummy'
+                }
+            });
+        }
     }
 }
 
@@ -106,6 +132,11 @@ const DOMPurify = createDOMPurify(window);
 
 // Add this function to check and send due messages
 async function checkAndSendMessages() {
+    if (!transporter) {
+        console.error('Email transporter not initialized');
+        return;
+    }
+
     console.log('\n=== Checking for messages to send ===');
     console.log('Current time:', new Date().toISOString());
     
@@ -117,7 +148,7 @@ async function checkAndSendMessages() {
 
     db.all(query, [], async (err, messages) => {
         if (err) {
-            console.error('Error checking messages:', err);
+            console.error('Database error:', err);
             return;
         }
 
@@ -125,12 +156,8 @@ async function checkAndSendMessages() {
         
         for (const message of messages) {
             try {
-                console.log(`\nSending message ${message.id}:`, {
-                    to: message.email,
-                    delivery_date: message.delivery_date,
-                    current_time: new Date().toISOString()
-                });
-
+                console.log(`\nPreparing to send message ${message.id} to ${message.email}`);
+                
                 const info = await transporter.sendMail({
                     from: '"Future Me" <noreply@futureme.com>',
                     to: message.email,
@@ -139,14 +166,15 @@ async function checkAndSendMessages() {
                     html: DOMPurify.sanitize(marked.parse(message.message))
                 });
 
-                console.log('Message sent:', {
+                console.log('Message sent successfully:', {
                     messageId: info.messageId,
-                    response: info.response
+                    response: info.response,
+                    accepted: info.accepted,
+                    rejected: info.rejected
                 });
-                
-                if (process.env.NODE_ENV === 'development') {
-                    const previewUrl = nodemailer.getTestMessageUrl(info);
-                    console.log('Preview URL:', previewUrl);
+
+                if (isDevelopment) {
+                    console.log('Preview URL:', nodemailer.getTestMessageUrl(info));
                 }
 
                 // Mark message as sent
@@ -156,7 +184,8 @@ async function checkAndSendMessages() {
                 console.error('Error sending message:', {
                     messageId: message.id,
                     error: error.message,
-                    stack: error.stack
+                    code: error.code,
+                    command: error.command
                 });
             }
         }
