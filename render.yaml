@@ -10,6 +10,6 @@ services:
       - key: RENDER
         value: "true"
       - key: EMAIL_USER
-        sync: false
+        value: futuremewisdom@gmail.com
       - key: EMAIL_PASS
-        sync: false
+        value: zzedumtqthtnrkux

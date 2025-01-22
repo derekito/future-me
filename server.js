@@ -11,15 +11,14 @@ const createDOMPurify = require('dompurify');
 const { JSDOM } = require('jsdom');
 const pagesRouter = require('./src/routes/pages');
 
-// Load environment variables
-dotenv.config();
+// Load environment variables based on NODE_ENV
+if (process.env.NODE_ENV === 'production') {
+    dotenv.config({ path: '.env.production' });
+} else {
+    dotenv.config({ path: '.env' });
+}
 
 function loadEnvironmentVariables() {
-    // Load from .env file in development
-    if (process.env.NODE_ENV !== 'production') {
-        require('dotenv').config();
-    }
-
     // Log environment status (without exposing sensitive data)
     console.log('Environment Configuration:', {
         NODE_ENV: process.env.NODE_ENV,
@@ -36,6 +35,11 @@ function loadEnvironmentVariables() {
     const missing = required.filter(key => !process.env[key]);
     
     if (missing.length > 0) {
+        console.error('Environment variables check failed:', {
+            NODE_ENV: process.env.NODE_ENV,
+            RENDER: process.env.RENDER,
+            missing
+        });
         throw new Error(
             `Missing required environment variables: ${missing.join(', ')}\n` +
             'Please ensure these are set in your environment or .env file.'
