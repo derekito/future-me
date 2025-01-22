@@ -4,13 +4,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize EasyMDE with bare minimum configuration
         const easyMDE = new EasyMDE({
             element: messageInput,
-            spellChecker: false,
-            status: false,
             toolbar: ['bold', 'italic', 'heading', '|', 
                      'quote', 'unordered-list', 'ordered-list', '|', 
                      'link', '|', 'guide'],
+            spellChecker: false,
+            status: false,
+            autofocus: false,
             autosave: false,
-            localStorage: false
+            initialValue: '',
+            placeholder: 'Write your message here...'
         });
 
         // Templates
