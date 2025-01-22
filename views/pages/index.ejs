@@ -26,7 +26,7 @@
         <div class="form-group">
             <label for="delivery-time">Delivery Time</label>
             <select id="delivery-time" name="deliveryTime" required>
-                <% if (process.env.NODE_ENV === 'development') { %>
+                <% if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'production') { %>
                     <option value="1">Test: In 1 minute</option>
                     <option value="5">Test: In 5 minutes</option>
                     <option value="10">Test: In 10 minutes</option>
