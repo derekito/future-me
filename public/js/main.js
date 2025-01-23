@@ -64,28 +64,39 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function showConfirmation(deliveryDate) {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'popup-overlay';
+    document.body.appendChild(overlay);
+
+    // Create confirmation popup
     const confirmationDiv = document.createElement('div');
-    confirmationDiv.className = 'confirmation-message';
-    confirmationDiv.innerHTML = `
-        <div class="confirmation-content">
-            <h3>Message Scheduled! ✨</h3>
-            <p>Your message has been scheduled for delivery on:</p>
-            <p class="delivery-date">${new Date(deliveryDate).toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            })}</p>
-            <button class="close-confirmation">Close</button>
-        </div>
-    `;
+    confirmationDiv.className = 'confirmation-popup';
+    
+    const closeButton = document.createElement('button');
+    closeButton.className = 'close-confirmation';
+    closeButton.innerHTML = '×';
+    
+    const heading = document.createElement('h3');
+    heading.textContent = 'Message Scheduled!';
+    
+    const message = document.createElement('p');
+    message.textContent = `Your message will be delivered on ${new Date(deliveryDate).toLocaleString()}`;
+    
+    confirmationDiv.appendChild(closeButton);
+    confirmationDiv.appendChild(heading);
+    confirmationDiv.appendChild(message);
     document.body.appendChild(confirmationDiv);
 
-    confirmationDiv.querySelector('.close-confirmation').addEventListener('click', () => {
-        confirmationDiv.remove();
-    });
+    // Close handlers
+    function removePopup() {
+        document.body.removeChild(confirmationDiv);
+        document.body.removeChild(overlay);
+    }
 
-    setTimeout(() => {
-        confirmationDiv.remove();
-    }, 5000);
+    closeButton.addEventListener('click', removePopup);
+    overlay.addEventListener('click', removePopup);
+
+    // Auto-remove after 5 seconds
+    setTimeout(removePopup, 5000);
 } 
