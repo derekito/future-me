@@ -73,6 +73,12 @@ function showConfirmation(deliveryDate) {
     const confirmationDiv = document.createElement('div');
     confirmationDiv.className = 'confirmation-popup';
     
+    // Add Ganesha image
+    const ganeshaImg = document.createElement('img');
+    ganeshaImg.src = '/images/ganesha.png';  // Make sure to add this image to your public/images folder
+    ganeshaImg.alt = 'Ganesha';
+    ganeshaImg.className = 'ganesha-icon';
+    
     const closeButton = document.createElement('button');
     closeButton.className = 'close-confirmation';
     closeButton.innerHTML = '×';
@@ -84,6 +90,7 @@ function showConfirmation(deliveryDate) {
     message.textContent = `Your message will be delivered on ${new Date(deliveryDate).toLocaleString()}`;
     
     confirmationDiv.appendChild(closeButton);
+    confirmationDiv.appendChild(ganeshaImg);
     confirmationDiv.appendChild(heading);
     confirmationDiv.appendChild(message);
     document.body.appendChild(confirmationDiv);
@@ -97,6 +104,6 @@ function showConfirmation(deliveryDate) {
     closeButton.addEventListener('click', removePopup);
     overlay.addEventListener('click', removePopup);
 
-    // Auto-remove after 5 seconds
-    setTimeout(removePopup, 5000);
+    // Auto-remove after 30 seconds instead of 5
+    setTimeout(removePopup, 30000);
 } 
