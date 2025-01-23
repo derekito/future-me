@@ -87,7 +87,12 @@ function showConfirmation(deliveryDate) {
     heading.textContent = 'Message Scheduled!';
     
     const message = document.createElement('p');
-    message.textContent = `Your message will be delivered on ${new Date(deliveryDate).toLocaleString()}`;
+    message.textContent = `Your message will be delivered on ${new Date(deliveryDate).toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    })}.`;
     
     confirmationDiv.appendChild(closeButton);
     confirmationDiv.appendChild(ganeshaImg);
