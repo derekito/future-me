@@ -596,7 +596,7 @@ textarea#message-input {
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: #fff;
-    padding: 30px 20px;
+    padding: 30px 40px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1000;
@@ -606,12 +606,13 @@ textarea#message-input {
 }
 
 .ganesha-icon {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 20px;
+    width: 120px;
+    height: 120px;
+    margin: 10px auto 30px;
     opacity: 0.8;
     filter: grayscale(20%);
     transition: all 0.3s ease;
+    display: block;
 }
 
 .ganesha-icon:hover {
@@ -621,7 +622,8 @@ textarea#message-input {
 }
 
 .confirmation-popup h3 {
-    margin-top: 10px;
+    margin-top: 0;
+    margin-bottom: 15px;
     color: #333;
 }
 
