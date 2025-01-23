@@ -606,10 +606,18 @@ textarea#message-input {
 }
 
 .ganesha-icon {
-    width: 60px;
-    height: 60px;
-    margin-bottom: 15px;
-    opacity: 0.9;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 20px;
+    opacity: 0.8;
+    filter: grayscale(20%);
+    transition: all 0.3s ease;
+}
+
+.ganesha-icon:hover {
+    opacity: 1;
+    filter: grayscale(0%);
+    transform: scale(1.05);
 }
 
 .confirmation-popup h3 {

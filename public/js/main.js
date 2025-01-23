@@ -75,7 +75,7 @@ function showConfirmation(deliveryDate) {
     
     // Add Ganesha image
     const ganeshaImg = document.createElement('img');
-    ganeshaImg.src = '/images/ganesha.png';  // Make sure to add this image to your public/images folder
+    ganeshaImg.src = '/images/ganesha.svg';  // Changed from .png to .svg
     ganeshaImg.alt = 'Ganesha';
     ganeshaImg.className = 'ganesha-icon';
     
